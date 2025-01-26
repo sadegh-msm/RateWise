@@ -1,0 +1,2 @@
+# RateWise
+Document rating application
