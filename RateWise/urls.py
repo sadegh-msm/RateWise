@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import ArticleListView, ArticleCreateView, RateArticleView
+
+from .views import DocumentListView, DocumentCreateView, RateDocumentView, UserCreateView
 
 urlpatterns = [
-    path('docs/', ArticleListView.as_view(), name='document-list'),
-    path('docs/create/', ArticleCreateView.as_view(), name='document-create'),
-    path('ratedoc/', RateArticleView.as_view(), name='rate-document'),
+    path('docs/', DocumentListView.as_view(), name='document-list'),
+    path('docs/create/', DocumentCreateView.as_view(), name='document-create'),
+    path('ratedoc/', RateDocumentView.as_view(), name='rate-document'),
+    path('user/', UserCreateView.as_view(), name='create_user'),
 ]
-

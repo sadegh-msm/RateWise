@@ -131,3 +131,49 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
     'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
 }
+
+APPEND_SLASH = False
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': (
+                '{asctime} | {levelname} | {name} | {module} | '
+                'Line {lineno} | {message}'
+            ),
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} | {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
