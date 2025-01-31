@@ -5,12 +5,13 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from django.core.cache import cache
 from django.db import transaction
-# from articles.redis_queue import enqueue_article_id
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from django.conf import settings
 import logging
+import amqp
+import json
 
 logger = logging.getLogger('django')
 cache_timeout = getattr(settings, "CACHE_TIMEOUT", 300)
@@ -61,9 +62,19 @@ class RateDocumentView(generics.CreateAPIView):
                 defaults={'score': int(score)}
             )
 
-        # enqueue_article_id(article.id)
-
+        self.enqueue_rating(user.id, document.id, int(score), rating.id)
         return Response({'message': 'Rated successfully'}, status=status.HTTP_200_OK)
+
+    def enqueue_rating(self, user_id, document_id, score, rating_id):
+        connection = amqp.Connection(host="localhost")
+        channel = connection.channel()
+
+        channel.queue_declare(queue='document_ratings', durable=True)
+
+        message = json.dumps({'user_id': user_id, 'document_id': document_id, 'score': score, 'rating_id': rating_id})
+        channel.basic_publish(amqp.Message(message, delivery_mode=2), routing_key='document_ratings')
+
+        connection.close()
 
 
 class UserCreateView(generics.CreateAPIView):

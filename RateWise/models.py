@@ -83,6 +83,31 @@ class Document(models.Model):
         cache.delete(f"document_{self.id}_std_dev")
         cache.delete(f"document_{self.id}_num_ratings")
 
+    def detect_outlier(self, rating_score):
+        num_ratings = self.number_of_ratings()
+        if num_ratings < 2:
+            return False
+
+        avg_score = self.calculate_average_score()
+        std_dev = self.calculate_standard_deviation()
+
+        # If std_dev is zero (all ratings so far are identical), then
+        # any new rating that's different can be considered an outlier.
+        if std_dev == 0:
+            return rating_score != avg_score
+
+        logger.info(
+            f"Detect outlier: Document {self.id} | "
+            f"avg_score: {avg_score}, std_dev: {std_dev}, "
+            f"new rating: {rating_score}"
+        )
+
+        # If the difference between the new rating and the average exceeds
+        # 2 standard deviations, then it's an outlier.
+        if abs(rating_score - avg_score) > 2 * std_dev:
+            return True
+        return False
+
     def __str__(self):
         return self.title
 
@@ -103,16 +128,16 @@ class Rating(models.Model):
             models.Index(fields=['document']),
         ]
 
-    def save(self, *args, **kwargs):
-        with transaction.atomic():
-            if self.pk:
-                old_rating = Rating.objects.get(pk=self.pk)
-                super().save(*args, **kwargs)
-                # update someones rating
-                self.document.update_cache_on_rating_change(new_score=self.score, old_score=old_rating.score)
-            else:
-                super().save(*args, **kwargs)
-                self.document.update_cache_on_rating_change(new_score=self.score)
+    # def save(self, *args, **kwargs):
+    #     with transaction.atomic():
+    #         if self.pk:
+    #             old_rating = Rating.objects.get(pk=self.pk)
+    #             super().save(*args, **kwargs)
+    #             # update someones rating
+    #             self.document.update_cache_on_rating_change(new_score=self.score, old_score=old_rating.score)
+    #         else:
+    #             super().save(*args, **kwargs)
+    #             self.document.update_cache_on_rating_change(new_score=self.score)
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():

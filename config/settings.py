@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "djoser",
     "rest_framework",
     "rest_framework.authtoken",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -72,17 +73,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 
 # Password validation
@@ -153,6 +143,27 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672/"
+BATCH_SIZE = 1000
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'process-ratings-every-10-seconds': {
+        'task': 'RateWise.tasks.process_doc',
+        'schedule': 10.0,
+    },
+    'process-outliers-every-1-min': {
+        'task': 'RateWise.tasks.process_outliers',
+        'schedule': 10.0,
+    },
+}
+
+OUTLIER_PROCESS_THRESHOLD = 120
 
 APPEND_SLASH = False
 
