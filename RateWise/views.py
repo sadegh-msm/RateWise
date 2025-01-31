@@ -9,9 +9,11 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
+from django.conf import settings
 import logging
 
 logger = logging.getLogger('django')
+cache_timeout = getattr(settings, "CACHE_TIMEOUT", 300)
 
 
 class DocumentListView(generics.ListAPIView):
@@ -24,7 +26,7 @@ class DocumentListView(generics.ListAPIView):
             logger.info("did not hit cache")
             documents = Document.objects.all().order_by('id')
             cached_documents = DocumentSerializer(documents, many=True).data
-            cache.set('documents', cached_documents, timeout=60)
+            cache.set('documents', cached_documents, timeout=cache_timeout)
 
         return cached_documents
 
@@ -68,3 +70,17 @@ class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+
+class DocumentStatsView(generics.CreateAPIView):
+    def get(self, request, document_id):
+        document = get_object_or_404(Document, id=document_id)
+
+        data = {
+            "document": document.title,
+            "average_score": document.calculate_average_score(),
+            "standard_deviation": document.calculate_standard_deviation(),
+            "number_of_ratings": document.number_of_ratings(),
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
