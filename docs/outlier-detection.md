@@ -4,7 +4,7 @@ This system manages user-submitted ratings for documents, detects outliers, and 
 
 ## Rating Submission and Initial Processing
 
-<img src="./Document_systems.png" width="800" height="200" />
+<img src="./Document_systems.png" width="1000" height="190" />
 
 ### Receiving a Rating
 - When a user submits a rating for a document, it is stored in the `Rating` model.
