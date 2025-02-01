@@ -13,6 +13,7 @@ batch_size = getattr(settings, "BATCH_SIZE", 1000)
 outlier_process_treshold = getattr(settings, "OUTLIER_PROCESS_THRESHOLD", 600)
 outlier_cache_key = "outlier_ratings"
 rabbit_host = getattr(settings, "RABBIT_HOST", "rabbitmq")
+batch_limit_outlier = getattr(settings, "BATCH_LIMIT_OUTLIER", 10)
 
 
 def store_outlier(doc_id, rating_id):
@@ -28,31 +29,33 @@ def store_outlier(doc_id, rating_id):
 
 @shared_task
 def process_outliers():
-    logger.info("Processing stored outliers\n\n")
+    logger.info("Processing stored outliers")
 
     outliers = cache.get(outlier_cache_key, [])
-    valid_outliers = []
+    remainig_outliers = []
+    processed_count = 0
 
     for outlier in outliers:
         try:
-            rating = Rating.objects.get(pk=outlier["rating_id"])
-            document = Document.objects.get(pk=outlier["document_id"])
-
             time_in_cache = time.time() - outlier["timestamp"]
 
-            if time_in_cache >= outlier_process_treshold:
+            if time_in_cache >= outlier_process_treshold and processed_count < batch_limit_outlier:
+                rating = Rating.objects.get(pk=outlier["rating_id"])
+                document = Document.objects.get(pk=outlier["document_id"])
+
                 rating.is_outlier = True
                 rating.save()
                 update_doc_stats.apply_async(args=(document.id,))
+                processed_count += 1
                 logger.info(f"Processed outlier {outlier['rating_id']} for document {outlier['document_id']}")
             else:
-                valid_outliers.append(outlier)  # Keep it in Redis if time not reached
+                remainig_outliers.append(outlier)  # Keep it in Redis if time not reached
                 logger.info(f"Outlier rating cant be processed due time left  by id: {outlier['rating_id']}")
 
         except (Rating.DoesNotExist, Document.DoesNotExist):
             pass
 
-    cache.set(outlier_cache_key, valid_outliers, timeout=cache_timeout)
+    cache.set(outlier_cache_key, remainig_outliers, timeout=cache_timeout)
 
 
 @shared_task

@@ -145,6 +145,7 @@ DATABASES = {
     }
 }
 
+BATCH_LIMIT_OUTLIER = 10
 CELERY_BROKER_URL = "amqp://guest:guest@rabbitmq:5672/"
 RABBIT_HOST = "rabbitmq"
 BATCH_SIZE = 1000
