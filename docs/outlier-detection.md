@@ -4,6 +4,8 @@ This system manages user-submitted ratings for documents, detects outliers, and 
 
 ## Rating Submission and Initial Processing
 
+<img src="./Document_systems.png" width="800" height="200" />
+
 ### Receiving a Rating
 - When a user submits a rating for a document, it is stored in the `Rating` model.
 - The system checks whether the rating is an outlier using `document.detect_outlier(rating.score)`, which is based on standard deviation calculations.
