@@ -20,6 +20,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.urls import path, re_path
+from RateWise.views import liveness_check, readiness_check
 
 
 schema_view = get_schema_view(
@@ -37,8 +38,9 @@ urlpatterns = [
     path('api/', include('djoser.urls')),
     path('api/', include('djoser.urls.authtoken')),
     path('api/', include('RateWise.urls')),
-    # path('api-auth/', include('rest_framework.urls')),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path("health/live/", liveness_check, name="liveness"),
+    path("health/ready/", readiness_check, name="readiness"),
 ]

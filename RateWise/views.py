@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from django.conf import settings
+from django.http import JsonResponse
+from django.db import connection
 import logging
 import amqp
 import json
@@ -96,3 +98,16 @@ class DocumentStatsView(generics.CreateAPIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+def liveness_check(request):
+    return JsonResponse({"status": "alive"}, status=200)
+
+
+def readiness_check(request):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")  # Simple DB check
+        return JsonResponse({"status": "ready"}, status=200)
+    except Exception:
+        return JsonResponse({"status": "unhealthy"}, status=500)
