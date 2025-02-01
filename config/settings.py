@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_celery_beat",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -125,7 +126,7 @@ DJOSER = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379/0',
+        'LOCATION': 'redis://redis:6379/0',
     }
 }
 
@@ -139,12 +140,13 @@ DATABASES = {
         'NAME': 'ratewise',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
 
-CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672/"
+CELERY_BROKER_URL = "amqp://guest:guest@rabbitmq:5672/"
+RABBIT_HOST = "rabbitmq"
 BATCH_SIZE = 1000
 
 CELERY_ACCEPT_CONTENT = ['json']
@@ -153,13 +155,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
 CELERY_BEAT_SCHEDULE = {
-    'process-ratings-every-10-seconds': {
+    'process-ratings-every-1-min': {
         'task': 'RateWise.tasks.process_doc',
-        'schedule': 10.0,
+        'schedule': 60.0,
     },
     'process-outliers-every-1-min': {
         'task': 'RateWise.tasks.process_outliers',
-        'schedule': 10.0,
+        'schedule': 60.0,
     },
 }
 
