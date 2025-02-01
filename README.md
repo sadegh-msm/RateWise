@@ -34,8 +34,8 @@ This approach ensures that extreme ratings (whether excessively high or low) do 
 The application is containerized using Docker and managed with Docker Compose. To deploy:
 1. Ensure Docker and Docker Compose are installed.
 2. Use the provided `docker-compose.yml` file to set up the necessary services, including the application and database.
-```
-   docker compose up -d 
+```bash
+docker compose up -d 
 ```
 3. Start the application using Docker Compose, which handles container orchestration.
 4. Access application UI with dajngo-admin in [localhost:8000/admin/](http://localhost:8000/admin/) and access rabbit UI in [localhost:15672](http://localhost:15672)
@@ -50,7 +50,7 @@ Automated tests are included to validate core functionalities:
 - Statistical analysis of ratings
 
 Tests can be run by this command:
-```
+```bash
 python manage.py test RateWise
 ```
 
