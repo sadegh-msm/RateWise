@@ -30,6 +30,7 @@ To maintain rating integrity, the system applies statistical techniques to detec
 4. **Handling Outliers**: Outliers will marked for review and will be applied after a short period of time.
 
 This approach ensures that extreme ratings (whether excessively high or low) do not disproportionately affect the overall document score.
+You can read more about this part in [Outlier Detection Documentation](/docs/outlier-detection.md).
 
 ## Deployment
 The application is containerized using Docker and managed with Docker Compose. To deploy:
