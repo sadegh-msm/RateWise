@@ -1,0 +1,31 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Ignore virtual environments
+venv/
+.venv/
+.env
+*.env
+
+# Ignore database files
+*.sqlite3
+
+# Ignore IDE and editor config files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore compiled files and coverage reports
+dist/
+*.egg-info/
+.coverage
+
+# Ignore Docker-related files
+docker-compose.override.yml
+
+.git/
