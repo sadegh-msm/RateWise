@@ -7,8 +7,9 @@ This application provides a document management system with user authentication,
 ## Features
 - User authentication and token-based authorization
 - Document creation and retrieval
-- Rating system with outlier detection
+- Rating system with outlier detection (Detects unusual ratings using statistical deviation)
 - Statistical analysis of document ratings
+- Automated Processing (Background tasks handle batch processing and outlier re-evaluation)
 
 ## Authentication
 The application uses token-based authentication. Users must authenticate to perform actions like creating documents, rating documents, and retrieving certain data. Tokens are generated upon user registration and are required for API requests.
