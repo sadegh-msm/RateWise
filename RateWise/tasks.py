@@ -13,7 +13,6 @@ batch_size = getattr(settings, "BATCH_SIZE", 1000)
 outlier_process_treshold = getattr(settings, "OUTLIER_PROCESS_THRESHOLD", 600)
 outlier_cache_key = "outlier_ratings"
 rabbit_host = getattr(settings, "RABBIT_HOST", "rabbitmq")
-batch_limit_outlier = getattr(settings, "BATCH_LIMIT_OUTLIER", 10)
 
 
 def store_outlier(doc_id, rating_id):
@@ -33,13 +32,21 @@ def process_outliers():
 
     outliers = cache.get(outlier_cache_key, [])
     remainig_outliers = []
+
+    total_outliers = len(outliers)
+
+    if total_outliers == 0:
+        logger.info("No outliers to process.")
+        return
+
+    dynamic_batch_size = max(1, int(total_outliers * 0.1))
     processed_count = 0
 
     for outlier in outliers:
         try:
             time_in_cache = time.time() - outlier["timestamp"]
 
-            if time_in_cache >= outlier_process_treshold and processed_count < batch_limit_outlier:
+            if time_in_cache >= outlier_process_treshold and processed_count < dynamic_batch_size:
                 rating = Rating.objects.get(pk=outlier["rating_id"])
                 document = Document.objects.get(pk=outlier["document_id"])
 
