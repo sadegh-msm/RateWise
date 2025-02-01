@@ -4,7 +4,7 @@ Document rating application
 ## Overview
 This application provides a document management system with user authentication, document creation, listing, rating, and rating analysis using outlier detection. Users can create and rate documents, and the system applies statistical techniques to detect anomalies in the ratings.
 
-<img src="./docs/system_overview.png" width="800" height="500" />
+<img src="./docs/system_overview.png" width="800" height="520" />
 
 ## Features
 - User authentication and token-based authorization
