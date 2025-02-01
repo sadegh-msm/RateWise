@@ -15,6 +15,7 @@ import json
 
 logger = logging.getLogger('django')
 cache_timeout = getattr(settings, "CACHE_TIMEOUT", 300)
+rabbit_host = getattr(settings, "RABBIT_HOST", "rabbitmq")
 
 
 class DocumentListView(generics.ListAPIView):
@@ -66,7 +67,7 @@ class RateDocumentView(generics.CreateAPIView):
         return Response({'message': 'Rated successfully'}, status=status.HTTP_200_OK)
 
     def enqueue_rating(self, user_id, document_id, score, rating_id):
-        connection = amqp.Connection(host="localhost")
+        connection = amqp.Connection(host=rabbit_host)
         channel = connection.channel()
 
         channel.queue_declare(queue='document_ratings', durable=True)

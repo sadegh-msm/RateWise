@@ -12,6 +12,7 @@ cache_timeout = getattr(settings, "CACHE_TIMEOUT", 300)
 batch_size = getattr(settings, "BATCH_SIZE", 1000)
 outlier_process_treshold = getattr(settings, "OUTLIER_PROCESS_THRESHOLD", 600)
 outlier_cache_key = "outlier_ratings"
+rabbit_host = getattr(settings, "RABBIT_HOST", "rabbitmq")
 
 
 def store_outlier(doc_id, rating_id):
@@ -57,7 +58,7 @@ def process_outliers():
 @shared_task
 def process_doc():
     logger.info("starting processing documents")
-    connection = amqp.Connection(host="localhost")
+    connection = amqp.Connection(host=rabbit_host)
     channel = connection.channel()
 
     channel.queue_declare(queue='document_ratings', durable=True)

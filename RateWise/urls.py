@@ -1,5 +1,4 @@
 from django.urls import path
-
 from .views import DocumentListView, DocumentCreateView, RateDocumentView, UserCreateView, DocumentStatsView
 
 urlpatterns = [
