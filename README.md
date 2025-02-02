@@ -44,7 +44,15 @@ docker compose up -d
 3. Start the application using Docker Compose, which handles container orchestration.
 4. Access application UI with dajngo-admin in [localhost:8000/admin/](http://localhost:8000/admin/) and access rabbit UI in [localhost:15672](http://localhost:15672)
 5. For testing you can access swagger in [localhost:8000/swagger/](http://localhost:8000/swagger/)
-
+6. You can also deploy the application in k8s using manifests.
+First build the required image:
+```
+docker build -t ratewise:1.0.0 .
+```
+  Then apply the manifest in kubernetes cluster
+```
+kubectl apply -f deployments/manifests
+```
 
 ## Running Tests
 Automated tests are included to validate core functionalities:
