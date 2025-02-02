@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratewise
+  namespace: ratewise
+  labels:
+    app: ratewise
+spec:
+  selector:
+    matchLabels:
+      app: ratewise
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ratewise
+    spec:
+      containers:
+      - name: django-app
+        image: ratewise:1.1.1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 100m
+            memory: 500Mi
+        
+        # livenessProbe:
+        #   httpGet:
+        #     path: /health/live/
+        #     port: 8000
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 15
+
+        # readinessProbe:
+        #   httpGet:
+        #     path: /health/ready/
+        #     port: 8000
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+
+        command: 
+          - "sh"
+          - "-c"
+          - "python /app/manage.py migrate --settings=config.settings && python /app/manage.py runserver 0.0.0.0:8000 --settings=config.settings"    
+        ports:
+        - containerPort:  8000
+          name:  retewise
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratewise
+  namespace: ratewise
+spec:
+  selector:
+    app: ratewise
+  ports:
+    - name: ratewise
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
